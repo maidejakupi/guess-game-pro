@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NumQuest — Guess the Number</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="container">
+
+        <header class="game-header">
+            <div class="logo">
+                <div class="logo-mark">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                        <polygon points="11,1 21,6 21,16 11,21 1,16 1,6" stroke="url(#lg)" stroke-width="1.5" fill="none"/>
+                        <circle cx="11" cy="11" r="3" fill="url(#lg)"/>
+                        <defs>
+                            <linearGradient id="lg" x1="1" y1="1" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#a78bfa"/>
+                                <stop offset="100%" stop-color="#38bdf8"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span class="logo-text">NumQuest</span>
+            </div>
+            <div class="header-right">
+                <span class="diff-badge" id="difficultyBadge">Easy · 1–100</span>
+                <button class="settings-toggle" id="settingsBtn" aria-label="Settings">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="settings-drawer" id="settingsPanel" hidden>
+            <p class="drawer-label">Select difficulty</p>
+            <div class="diff-options">
+                <button class="diff-btn active" data-max="100" data-label="Easy · 1–100">
+                    <span class="diff-name">Easy</span>
+                    <span class="diff-range">1 – 100</span>
+                </button>
+                <button class="diff-btn" data-max="500" data-label="Medium · 1–500">
+                    <span class="diff-name">Medium</span>
+                    <span class="diff-range">1 – 500</span>
+                </button>
+                <button class="diff-btn" data-max="1000" data-label="Hard · 1–1000">
+                    <span class="diff-name">Hard</span>
+                    <span class="diff-range">1 – 1000</span>
+                </button>
+            </div>
+        </div>
+
+        <main class="game-card" id="gameCard">
+
+            <div class="proximity-ring" id="proximityRing"></div>
+
+            <div class="hint-track">
+                <div class="hint-bar" id="hintBar"></div>
+                <div class="hint-glow" id="hintGlow"></div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <span class="stat-label">Attempts</span>
+                    <span class="stat-value" id="attemptsDisplay">0</span>
+                </div>
+                <div class="stat-card stat-card--center">
+                    <span class="stat-label">Best</span>
+                    <span class="stat-value" id="bestDisplay">—</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Range</span>
+                    <span class="stat-value range-val" id="rangeDisplay">1–100</span>
+                </div>
+            </div>
+
+            <div class="message-zone" id="messageArea">
+                <div class="msg-icon-wrap" id="msgIconWrap">
+                    <span class="message-icon" id="messageIcon">🎯</span>
+                </div>
+                <p class="message-text" id="messageText">Pick a number and take your shot.</p>
+            </div>
+
+            <div class="guess-history" id="guessHistory"></div>
+
+            <div class="input-group" id="inputGroup">
+                <div class="input-wrap">
+                    <input
+                        type="number"
+                        id="guessInput"
+                        class="guess-input"
+                        placeholder="Your number…"
+                        min="1"
+                        max="100"
+                        autocomplete="off"
+                    />
+                    <div class="input-line"></div>
+                </div>
+                <button class="guess-btn" id="guessBtn" onclick="checkGuess()">
+                    <span class="btn-label">Guess</span>
+                    <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="action-row" id="actionRow" hidden>
+                <button class="btn-play-again" onclick="resetGame()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.36"/></svg>
+                    Play again
+                </button>
+                <button class="btn-share" id="shareBtn">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    Share score
+                </button>
+            </div>
+
+        </main>
+
+        <footer class="game-footer">
+            NumQuest &mdash; sharpen your instincts
+        </footer>
+
+    </div>
+
+    <div class="win-burst" id="winBurst"></div>
+    <div class="toast" id="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
